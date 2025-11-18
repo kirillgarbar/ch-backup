@@ -600,7 +600,6 @@ class BackupLayout:
             if local_path
             else self._get_cloud_storage_metadata_dst_path(backup_meta, disk)
         )
-        os.makedirs(disk_path, exist_ok=True)
         metadata_remote_paths = self._get_cloud_storage_metadata_remote_paths(
             backup_name, source_disk_name, compression
         )
@@ -617,6 +616,7 @@ class BackupLayout:
                         compression=compression,
                     )
                 else:
+                    os.makedirs(disk_path, exist_ok=True)
                     self._storage_loader.download_files(
                         remote_path=remote_path,
                         local_path=disk_path,
