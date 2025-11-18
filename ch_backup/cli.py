@@ -11,7 +11,7 @@ import uuid
 from collections import OrderedDict
 from functools import wraps
 from pathlib import Path as PathlibPath
-from typing import Iterable, Tuple, Union
+from typing import Iterable, Optional, Tuple, Union
 
 from click import Choice, Path, argument, pass_context, style
 from cloup import (
@@ -702,17 +702,24 @@ def version_command(_ctx: Context, _ch_backup: ClickhouseBackup) -> None:
 @argument("name", metavar="BACKUP")
 @option("--disk", type=str, required=True, help="Disk to get metadata")
 @option(
-    "--tar",
-    "tar",
+    "--pipe-path",
+    "pipe_path",
+    type=Optional[str],
+    default=None,
+    help="Download metadata as tar archive and write it to named pipe,",
+)
+@option(
+    "--fail",
+    "fail",
     is_flag=True,
-    help="Download metadata as tar archive and do not unpack it.",
 )
 def get_cloud_storage_metadata(
     ctx: Context,
     ch_backup: ClickhouseBackup,
     name: str,
     disk: str,
-    tar: bool,
+    pipe_path: Optional[str],
+    fail: bool,
 ) -> None:
     """Download cloud storage metadata to shadow directory"""
     try:
@@ -723,10 +730,19 @@ def get_cloud_storage_metadata(
         print(e)
         return
 
-    if not ch_backup.get_cloud_storage_metadata(
-        backup_name=name, disk_name=disk, tar=tar
-    ):
-        print(f"Metadata for disk {disk} and backup {name} is already present")
+    if pipe_path:
+        if os.path.exists(pipe_path):
+            raise RuntimeError(f"Named pipe {pipe_path} already exists")
+        os.mkfifo(pipe_path)
+
+    try:
+        if not ch_backup.get_cloud_storage_metadata(
+            backup_name=name, disk_name=disk, local_path=pipe_path, fail=fail
+        ):
+            print(f"Metadata for disk {disk} and backup {name} is already present")
+    finally:
+        if pipe_path:
+            os.remove(pipe_path)
 
 
 def _validate_and_resolve_name(
