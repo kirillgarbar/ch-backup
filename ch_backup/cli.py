@@ -702,11 +702,11 @@ def version_command(_ctx: Context, _ch_backup: ClickhouseBackup) -> None:
 @argument("name", metavar="BACKUP")
 @option("--disk", type=str, required=True, help="Disk to get metadata")
 @option(
-    "--pipe-path",
-    "pipe_path",
+    "--local-path",
+    "local_path",
     type=Optional[str],
     default=None,
-    help="Download metadata as tar archive and write it to named pipe,",
+    help="Download metadata as tar archive and write it to given path",
 )
 @option(
     "--fail",
@@ -718,7 +718,7 @@ def get_cloud_storage_metadata(
     ch_backup: ClickhouseBackup,
     name: str,
     disk: str,
-    pipe_path: Optional[str],
+    local_path: Optional[str],
     fail: bool,
 ) -> None:
     """Download cloud storage metadata to shadow directory"""
@@ -730,19 +730,14 @@ def get_cloud_storage_metadata(
         print(e)
         return
 
-    if pipe_path:
-        if os.path.exists(pipe_path):
-            raise RuntimeError(f"Named pipe {pipe_path} already exists")
-        os.mkfifo(pipe_path)
+    if local_path:
+        if os.path.exists(local_path):
+            raise RuntimeError(f"Local path {local_path} already exists")
 
-    try:
-        if not ch_backup.get_cloud_storage_metadata(
-            backup_name=name, disk_name=disk, local_path=pipe_path, fail=fail
-        ):
-            print(f"Metadata for disk {disk} and backup {name} is already present")
-    finally:
-        if pipe_path:
-            os.remove(pipe_path)
+    if not ch_backup.get_cloud_storage_metadata(
+        backup_name=name, disk_name=disk, local_path=local_path, fail=fail
+    ):
+        print(f"Metadata for disk {disk} and backup {name} is already present")
 
 
 def _validate_and_resolve_name(
