@@ -5,6 +5,7 @@ Write file stage.
 from pathlib import Path
 from typing import BinaryIO, Optional
 
+from ch_backup import logging
 from ch_backup.storage.async_pipeline.base_pipeline.handler import Handler
 from ch_backup.storage.async_pipeline.stages.types import StageType
 
@@ -24,6 +25,7 @@ class WriteFileStage(Handler):
         self._fobj = self._file_path.open("bw", buffering=0)  # Switch off buffering
 
     def __call__(self, data: bytes, index: int) -> None:
+        logging.debug(f"Write {data}")
         assert self._fobj
         self._fobj.write(data)
 

@@ -4,6 +4,7 @@ Downloading object from a storage stage.
 
 from typing import Iterable, Optional
 
+from ch_backup import logging
 from ch_backup.storage.async_pipeline.base_pipeline.handler import InputHandler
 from ch_backup.storage.async_pipeline.stages.types import StageType
 from ch_backup.storage.engine.base import PipeLineCompatibleStorageEngine
@@ -32,6 +33,8 @@ class DownloadStorageStage(InputHandler):
             data = self._loader.download_part(
                 download_id=self._download_id, part_len=self._chunk_size
             )
+            logging.debug(f"Download {data}")
+
             if not data:
                 return
             yield data
