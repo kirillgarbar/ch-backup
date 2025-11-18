@@ -315,7 +315,17 @@ class PipelineBuilder:
         """
         Build writing single file stage.
         """
-        self.append(thread_map(WriteFileStage(file_path)))
+
+        stage_config = self._config[WriteFilesStage.stype]
+
+        buffer_size = stage_config["buffer_size"]
+        chunk_size = stage_config["chunk_size"]
+        queue_size = stage_config["queue_size"]
+
+        self.append(
+            thread_flat_map(ChunkingStage(chunk_size, buffer_size), maxsize=queue_size),
+            thread_map(WriteFileStage(file_path)),
+        )
         return self
 
     def build_delete_multiple_storage_stage(

@@ -23,6 +23,7 @@ class WriteFileStage(Handler):
 
     def on_start(self) -> None:
         self._fobj = self._file_path.open("bw", buffering=0)  # Switch off buffering
+        logging.debug(f"Write opened")
 
     def __call__(self, data: bytes, index: int) -> None:
         logging.debug(f"Write {data}")
