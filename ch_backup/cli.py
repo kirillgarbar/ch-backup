@@ -730,10 +730,6 @@ def get_cloud_storage_metadata(
         print(e)
         return
 
-    if local_path:
-        if os.path.exists(local_path):
-            raise RuntimeError(f"Local path {local_path} already exists")
-
     if not ch_backup.get_cloud_storage_metadata(
         backup_name=name, disk_name=disk, local_path=local_path, fail=fail
     ):
