@@ -11,7 +11,7 @@ import uuid
 from collections import OrderedDict
 from functools import wraps
 from pathlib import Path as PathlibPath
-from typing import Iterable, Optional, Tuple, Union
+from typing import Iterable, Tuple, Union
 
 from click import Choice, Path, argument, pass_context, style
 from cloup import (
@@ -704,8 +704,8 @@ def version_command(_ctx: Context, _ch_backup: ClickhouseBackup) -> None:
 @option(
     "--local-path",
     "local_path",
-    type=Optional[str],
-    default=None,
+    type=str,
+    default="",
     help="Download metadata as tar archive and write it to given path",
 )
 @option(
@@ -718,7 +718,7 @@ def get_cloud_storage_metadata(
     ch_backup: ClickhouseBackup,
     name: str,
     disk: str,
-    local_path: Optional[str],
+    local_path: str,
     fail: bool,
 ) -> None:
     """Download cloud storage metadata to shadow directory"""
