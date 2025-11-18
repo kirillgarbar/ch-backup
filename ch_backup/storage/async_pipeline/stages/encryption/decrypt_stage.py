@@ -2,6 +2,7 @@
 Decrypting stage.
 """
 
+from ch_backup import logging
 from ch_backup.encryption import BaseEncryption
 from ch_backup.storage.async_pipeline.base_pipeline.handler import Handler
 from ch_backup.storage.async_pipeline.stages.types import StageType
@@ -19,4 +20,5 @@ class DecryptStage(Handler):
 
     def __call__(self, data: bytes, index: int) -> bytes:
         decrypted_data = self._crypto.decrypt(data)
+        logging.debug(f"Decrypt {decrypted_data}")
         return decrypted_data

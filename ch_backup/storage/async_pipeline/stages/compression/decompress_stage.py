@@ -4,6 +4,7 @@ Decompressing stage.
 
 from typing import Optional
 
+from ch_backup import logging
 from ch_backup.compression.base import BaseCompression
 from ch_backup.storage.async_pipeline.base_pipeline.handler import Handler
 from ch_backup.storage.async_pipeline.stages.types import StageType
@@ -21,12 +22,17 @@ class DecompressStage(Handler):
 
     def __call__(self, data: bytes, index: int) -> Optional[bytes]:
         decompressed_data = self._compressor.decompress(data)
+        logging.debug("Decompress")
         if len(decompressed_data) > 0:
+            logging.debug(f"Decompress {decompressed_data}")
+
             return decompressed_data
         return None
 
     def on_done(self) -> Optional[bytes]:
         decompressed_data = self._compressor.flush_decompress()
         if len(decompressed_data) > 0:
+            logging.debug(f"Decompress on done {decompressed_data}")
+
             return decompressed_data
         return None
