@@ -446,12 +446,13 @@ class ClickhouseBackup:
             backup_meta, source_disk
         ):
             return False
+        
+        if fail:
+            raise RuntimeError("FAIL1")
 
         self._context.backup_layout.download_cloud_storage_metadata(
             backup_meta, source_disk, disk_name, local_path
         )
-        if fail:
-            raise RuntimeError("FAIL")
         self._context.backup_layout.wait()
 
         return True
